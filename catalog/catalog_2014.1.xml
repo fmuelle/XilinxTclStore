@@ -125,6 +125,10 @@
           <summary>reports all primitives (LIB_CELL) in the design</summary>
         </proc>
         <proc>
+          <name>report_backbone_usage</name>
+          <summary>reports CMT backbone usage for a list of nets</summary>
+        </proc>
+        <proc>
           <name>report_cells_fanout</name>
           <summary>report the fanout of cells matching a REF_NAME pattern</summary>
         </proc>
