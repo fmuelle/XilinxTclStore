@@ -98,13 +98,13 @@ proc ::tclapp::xilinx::designutils::report_backbone_usage::report_backbone_usage
 		set BBnode [file tail [lindex [get_nodes -quiet -of $net -filter NAME=~*/${BBnodePattern}] 0]] 
 		if {[llength $BBused] == 0} {
 			set status "Fabric"
-		} elseif {[llength $BBused] == [llength [get_BB_clk_regions $sourceClockRegion $destClockRegion]]} { 
+		} elseif {[llength $BBused] == [llength [get_backbone_clk_regions $sourceClockRegion $destClockRegion]]} { 
 			set status "All Backbone"
 		} else {
 			set status "Partial Backbone"
 		}
 		if {$table} {
-			$net_table addrow [list $i $net $BBnode $sourceCell $destCell $sourceClockRegion $destClockRegion $BBused [get_BB_clk_regions $sourceClockRegion $destClockRegion] $constraint $status]
+			$net_table addrow [list $i $net $BBnode $sourceCell $destCell $sourceClockRegion $destClockRegion $BBused [get_backbone_clk_regions $sourceClockRegion $destClockRegion] $constraint $status]
 		}
 		incr i
 		lappend overallStatus $status 
