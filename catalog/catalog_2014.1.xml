@@ -129,6 +129,10 @@
           <summary>reports CMT backbone usage for a list of nets</summary>
         </proc>
         <proc>
+          <name>report_backbone_utilization</name>
+          <summary>reports CMT backbone utilization for the current design</summary>
+        </proc>
+        <proc>
           <name>report_cells_fanout</name>
           <summary>report the fanout of cells matching a REF_NAME pattern</summary>
         </proc>

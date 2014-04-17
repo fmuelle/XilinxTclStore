@@ -51,9 +51,13 @@ proc ::tclapp::xilinx::designutils::report_backbone_usage::report_backbone_usage
 	# CMT backbone only exists on 7-series
 	set arch [get_property ARCHITECTURE [get_parts -of [current_design]]]
 	if {!($arch eq "virtex7" || $arch eq "kintex7" || $arch eq "artix7")} {
-	error " error - report_cmt_backbone_util comand only supports 7-series devices."
+	error " error - report_backbone_usage comand only supports 7-series devices."
 	}
 	
+	if {$nets eq {}} {
+	error " error - No nets to analyze.  report_backbone_usage comand expects a list of nets."
+	}
+
 	if {$table} {
 		set net_table [::tclapp::xilinx::designutils::prettyTable create]
 		$net_table header { {Index} {Net} {CMT Backbone Node} {Source LIB_CELL} {Destination LIB_CELL(s)} {Source Clock Region} {Destination Clock Region(s)} {BB Clock Region Used} {BB Clock Region Req.} {CDR Constraint} {CMT Backbone Route}}
@@ -62,6 +66,7 @@ proc ::tclapp::xilinx::designutils::report_backbone_usage::report_backbone_usage
 	set BBnodePattern PLL_CLK_FREQ_BB?_NS
 
 	set i 1
+	set overallStatus {}
 	foreach net $nets {
 		set sourceCell [get_lib_cells -of [get_cells -of [get_pins -leaf -of $net -filter DIRECTION==OUT]]]
 		set sourceClockRegion [lsort -unique -decreasing [get_clock_regions -of [get_cells -of [get_pins -leaf -of $net -filter DIRECTION==OUT]]]]

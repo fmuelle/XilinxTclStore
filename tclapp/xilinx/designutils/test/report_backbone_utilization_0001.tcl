@@ -9,11 +9,11 @@ puts "== Unit Test name: $unit_test"
 # Set the Name to the name of the script
 set name [file rootname [file tail [info script]]]
 
-# Load the Design Checkpoint for the specific test
-open_checkpoint "$file_dir/src/report_backbone_usage/$name.dcp"
+# Load the Design Checkpoint for the specific test (we can use the report_backbone_usage src)
+open_checkpoint "$file_dir/src/report_backbone_usage/report_backbone_usage_0001.dcp"
 
-# Run the report_backbone_usage script and verify that no error was reported
-if {[catch { ::tclapp::xilinx::designutils::report_backbone_usage::report_backbone_usage [get_nets -hier -filter CLOCK_DEDICATED_ROUTE!=""] true } catchErrorString]} {
+# Run the report_backbone_utilization script and verify that no error was reported
+if {[catch { ::tclapp::xilinx::designutils::report_backbone_utilization } catchErrorString]} {
     close_design
     error [format " -E- Unit test $name failed: %s" $catchErrorString]   
 }
