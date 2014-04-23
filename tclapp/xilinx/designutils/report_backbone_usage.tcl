@@ -81,7 +81,7 @@ proc ::tclapp::xilinx::designutils::report_backbone_usage::report_backbone_usage
 		set destCell [get_lib_cells -of [get_cells -of [get_pins -leaf -of $net -filter DIRECTION==IN]]]
 		set destClockRegion [lsort -unique -decreasing [get_clock_regions -of [get_cells -of [get_pins -leaf -of $net -filter DIRECTION==IN]]]]
 		#need to check for CDR=BACKBONE constraint on net of IBUFDS I pin of $net and $net 
-		set IBUFDS_Ipin_net [get_nets -quiet -of [get_pins -quiet -of [get_cells -quiet -of [get_pins -leaf -of $net -filter DIRECTION==OUT] -filter LIB_CELL=~IBUF*] -filter REF_PIN_NAME=~I]] 
+		set IBUFDS_Ipin_net [get_nets -segments -top_net_of_hierarchical_group -quiet -of [get_pins -quiet -of [get_cells -quiet -of [get_pins -leaf -of $net -filter DIRECTION==OUT] -filter LIB_CELL=~IBUF*] -filter REF_PIN_NAME=~I]] 
 		if {$IBUFDS_Ipin_net ne ""} {
 			set constraint [lsort -unique [concat [get_property CLOCK_DEDICATED_ROUTE $net] [get_property CLOCK_DEDICATED_ROUTE $IBUFDS_Ipin_net]]]
 			if {[get_property CLOCK_DEDICATED_ROUTE $IBUFDS_Ipin_net]!=""} {
@@ -122,12 +122,12 @@ proc ::tclapp::xilinx::designutils::report_backbone_usage::report_backbone_usage
 	# return overall CMT backbone route status of nets 
 	# All Backbone: 		All nets are routed on CMT backbone
 	# Partial Backbone: 	Some nets are routed on CMT backbone
-	# Fabric: 				All nets are routed on fabric
+	# All Fabric: 				All nets are routed on fabric
 	if {([lsearch $overallStatus "Fabric"] != -1)} {
 		if {([lsearch $overallStatus "*Backbone"] != -1)} {
 			set return_val "Partial Backbone"
 		} else {
-			set return_val "Fabric"
+			set return_val "All Fabric"
 		}
 	} else {
 		if {([lsearch $overallStatus "Partial*"] != -1)} {

@@ -26,9 +26,10 @@ proc ::tclapp::xilinx::designutils::report_backbone_utilization {} {
 	
 	# loop through CMT Backbone nodes of left and right CMT columns and collect data for get_nets -of nodes 
 	set BB_node PLL_CLK_FREQ_BB0_NS
+	set all_BB_nodes [get_nodes CMT_TOP_?_UPPER_T_*/PLL_CLK_FREQ_BB*_NS]
 	foreach side {R L} {
 		if {$side eq "R"} {set CMT_col "Left"} else {set CMT_col "Right"}
-		foreach node_name [get_nodes CMT_TOP_${side}_UPPER_T_*/$BB_node] {
+		foreach node_name [filter $all_BB_nodes NAME=~CMT_TOP_${side}_UPPER_T_*/$BB_node] {
 			foreach num {3 2 1 0} {
 				regsub -all "BB0" $node_name "BB${num}" node
 				set node [get_nodes $node]
@@ -41,7 +42,7 @@ proc ::tclapp::xilinx::designutils::report_backbone_utilization {} {
 					set dest_clock_region [lsort -unique -decreasing [get_clock_regions -of [get_cells -of [get_pins -leaf -of [get_nets -quiet -of $node] -filter DIRECTION==IN]]]]
 					lappend BBused($current_BB_net) [lindex [get_clock_regions -of  [get_sites -of [get_tiles -of $node]]] 0]
 					#need to check for CDR=BACKBONE constraint on input and output of IBUFDS  
-					set IBUFDS_Ipin_net [get_nets -quiet -of [get_pins -quiet -of [get_cells -quiet -of [get_pins -leaf -of [get_nets -quiet -of $node] -filter DIRECTION==OUT] -filter LIB_CELL=~IBUFDS*] -filter REF_PIN_NAME=~I]] 
+					set IBUFDS_Ipin_net [get_nets -segments -top_net_of_hierarchical_group -quiet -of [get_pins -quiet -of [get_cells -quiet -of [get_pins -leaf -of [get_nets -quiet -of $node] -filter DIRECTION==OUT] -filter LIB_CELL=~IBUF*] -filter REF_PIN_NAME=~I]] 
 					if {$IBUFDS_Ipin_net ne ""} {
 						set constraint [lsort -unique [concat [get_property CLOCK_DEDICATED_ROUTE [get_nets -quiet -of $node]] [get_property CLOCK_DEDICATED_ROUTE $IBUFDS_Ipin_net]]]
 					} else {
@@ -108,7 +109,7 @@ proc ::tclapp::xilinx::designutils::report_backbone_utilization {} {
 	foreach side {R L} {
 		if {$side eq "R"} {set CMT_col "Left"} else {set CMT_col "Right"}
 		#need to sort the nodes from BB3 downto BB0 so list of occupied nodes can be properly assembled
-		foreach node [lsort -decreasing [get_nodes CMT_TOP_${side}_UPPER_T_*/PLL_CLK_FREQ_BB*_NS]] {
+		foreach node [lsort -decreasing [filter $all_BB_nodes NAME=~CMT_TOP_${side}_UPPER_T_*/PLL_CLK_FREQ_BB*_NS]] {
 			set index [lsearch [dict keys $netInfo] $BBresource($node)]
 			if {$index == -1} {set index "  "} else {[incr index]}
 			lappend BBclockRegion${CMT_col}([lindex [get_clock_regions -of  [get_sites -of [get_tiles -of $node]]] 0]) [format {%2s} $index]
